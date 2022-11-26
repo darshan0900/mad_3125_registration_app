@@ -116,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
                 showToast("Logged In");
             }
         }
-        if (!error) {
+        if (!error && currFormState == FormState.LOGIN) {
             switchToLogin();
         }
     }
