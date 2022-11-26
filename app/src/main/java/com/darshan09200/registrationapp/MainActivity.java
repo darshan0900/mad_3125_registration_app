@@ -2,11 +2,7 @@ package com.darshan09200.registrationapp;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.app.Activity;
 import android.os.Bundle;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -47,9 +43,7 @@ public class MainActivity extends AppCompatActivity {
 
         switchToLogin();
 
-        formBtn.setOnClickListener(view -> {
-            onFormSubmit();
-        });
+        formBtn.setOnClickListener(view -> onFormSubmit());
 
         switchBtn.setOnClickListener(view -> {
             if (currFormState == FormState.LOGIN) switchToSignup();
