@@ -15,6 +15,8 @@ public class Database {
 
     private ArrayList<User> users;
 
+    private User loggedInUser;
+
     private Database() {
         users = new ArrayList<>();
     }
@@ -49,12 +51,23 @@ public class Database {
     }
 
     public Status isValidLogin(String username, String password) {
+        Status currentStatus = Status.INVALID_PASSWORD;
         int userIndex = getUser(username);
         if (userIndex > -1) {
             User user = users.get(userIndex);
-            return user.isValid(password) ? Status.LOGGED_IN : Status.INVALID_PASSWORD;
+            if (user.isValid(password)) {
+                currentStatus = Status.LOGGED_IN;
+                loggedInUser = user;
+            }
         }
-        return Status.INVALID_PASSWORD;
+        return currentStatus;
     }
 
+    public User getLoggedInUser() {
+        return loggedInUser;
+    }
+
+    public void logoutUser() {
+        loggedInUser = null;
+    }
 }

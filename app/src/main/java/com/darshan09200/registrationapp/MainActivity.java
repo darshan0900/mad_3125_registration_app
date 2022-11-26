@@ -12,18 +12,20 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 enum FormState {
     LOGIN,
-    SIGNUP
+    SIGNUP,
+    LOGGED_IN
 }
 
 public class MainActivity extends AppCompatActivity {
 
     private EditText username, password, firstName, lastName;
+    private TextView loggedInDetails;
     private Button formBtn, switchBtn;
-
     private FormState currFormState = FormState.LOGIN;
 
     @Override
@@ -37,6 +39,8 @@ public class MainActivity extends AppCompatActivity {
         password = findViewById(R.id.password);
         firstName = findViewById(R.id.firstName);
         lastName = findViewById(R.id.lastNme);
+
+        loggedInDetails = findViewById(R.id.loggedInDetails);
 
         formBtn = findViewById(R.id.formBtn);
         switchBtn = findViewById(R.id.switchBtn);
@@ -77,7 +81,42 @@ public class MainActivity extends AppCompatActivity {
         switchBtn.setText("Already have an account? Login");
     }
 
+    public void showLoggedInDetails() {
+        User loggedInUser = Database.getInstance().getLoggedInUser();
+        if (loggedInUser != null) {
+            currFormState = FormState.LOGGED_IN;
+            username.setVisibility(View.GONE);
+            password.setVisibility(View.GONE);
+
+            firstName.setVisibility(View.GONE);
+            lastName.setVisibility(View.GONE);
+            switchBtn.setVisibility(View.GONE);
+
+            loggedInDetails.setVisibility(View.VISIBLE);
+            String details = "First Name: " + loggedInUser.getFirstName() + "\nLast Name: " + loggedInUser.getLastName();
+            loggedInDetails.setText(details);
+
+            formBtn.setText("Logout");
+        }
+    }
+
+    public void logout() {
+        Database.getInstance().logoutUser();
+
+        username.setVisibility(View.VISIBLE);
+        password.setVisibility(View.VISIBLE);
+        switchBtn.setVisibility(View.VISIBLE);
+
+        loggedInDetails.setVisibility(View.GONE);
+
+        switchToLogin();
+    }
+
     public void onFormSubmit() {
+        if (currFormState == FormState.LOGGED_IN) {
+            logout();
+            return;
+        }
         String usernameInput = username.getText().toString().trim();
         String passwordInput = password.getText().toString();
         String firstNameInput = firstName.getText().toString().trim();
@@ -116,8 +155,11 @@ public class MainActivity extends AppCompatActivity {
                 showToast("Logged In");
             }
         }
-        if (!error && currFormState == FormState.LOGIN) {
-            switchToLogin();
+        if (!error) {
+            if (currFormState == FormState.LOGIN)
+                showLoggedInDetails();
+            else
+                switchToLogin();
         }
     }
 
