@@ -1,5 +1,6 @@
 package com.darshan09200.registrationapp;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
@@ -116,44 +117,40 @@ public class MainActivity extends AppCompatActivity {
         String firstNameInput = firstName.getText().toString().trim();
         String lastNameInput = lastName.getText().toString().trim();
 
-        boolean error = false;
 
         if (usernameInput.isEmpty()) {
             showToast("Please enter username");
-            error = true;
         } else if (passwordInput.isEmpty()) {
             showToast("Please enter password");
-            error = true;
         } else if (currFormState == FormState.SIGNUP) {
             if (firstNameInput.isEmpty()) {
                 showToast("Please enter first name");
-                error = true;
             } else if (lastNameInput.isEmpty()) {
                 showToast("Please enter last name");
-                error = true;
             } else {
-                Status userAddStatus = Database.getInstance().addNewUser(new User(firstNameInput, lastNameInput, usernameInput, passwordInput));
-                if (userAddStatus == Status.USER_EXISTS) {
-                    showToast("User already exists");
-                    error = true;
-                } else {
-                    showToast("User Added");
-                }
+                new AlertDialog.Builder(this)
+                        .setMessage("Are you sure?")
+                        .setPositiveButton("Yes, I am sure!", (dialog, which) -> {
+                            Status userAddStatus = Database.getInstance().addNewUser(new User(firstNameInput, lastNameInput, usernameInput, passwordInput));
+                            if (userAddStatus == Status.USER_EXISTS) {
+                                showToast("User already exists");
+                            } else {
+                                showToast("User Added");
+                                switchToLogin();
+                            }
+                        })
+                        .setNegativeButton("No!", null)
+                        .show();
+
             }
         } else {
             Status userLoginStatus = Database.getInstance().isValidLogin(usernameInput, passwordInput);
             if (userLoginStatus == Status.INVALID_PASSWORD) {
                 showToast("Invalid username/password");
-                error = true;
             } else {
                 showToast("Logged In");
-            }
-        }
-        if (!error) {
-            if (currFormState == FormState.LOGIN)
                 showLoggedInDetails();
-            else
-                switchToLogin();
+            }
         }
     }
 
